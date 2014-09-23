@@ -1,0 +1,23 @@
+<string xmlns="http://www.webserviceX.NET/">
+	<StockQuotes>
+		<Stock>
+			<Symbol>YHOO</Symbol>
+			<Last>38.62</Last>
+			<Date>9/22/2014</Date>
+			<Time>11:40am</Time>
+			<Change>-2.31</Change>
+			<Open>39.81</Open>
+			<High>40.04</High>
+			<Low>38.37</Low>
+			<Volume>62072760</Volume>
+			<MktCap>38.412B</MktCap>
+			<PreviousClose>40.93</PreviousClose>
+			<PercentageChange>-5.64%</PercentageChange>
+			<AnnRange>30.02 - 44.01</AnnRange>
+			<Earns>1.157</Earns>
+			<P-E>35.38</P-E>
+			<Name>Yahoo! Inc.</Name>
+		</Stock>
+	</StockQuotes>
+</string>
+<!--  API : http://www.webservicex.net/stockquote.asmx/GetQuote -->

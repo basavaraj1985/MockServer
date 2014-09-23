@@ -1,0 +1,16 @@
+<Results>
+	<Urls>
+		<ScheduleUrl>http://cricinfo.com/matches/schedule</ScheduleUrl>
+		<NewsUrl>http://cricinfo.com/cricket/news/home</NewsUrl>
+		<GameUrl>http://cricinfo.com/cricket-games/</GameUrl>
+		<VideoUrl>http://cricinfo.com/cricket/videos/home</VideoUrl>
+		<PhotoUrl>http://cricinfo.com/photos/archives</PhotoUrl>
+		<UpcomingUrl>http://cricinfo.com/matches/schedule</UpcomingUrl>
+		<RecentUrl>http://cricinfo.com/matches/archive</RecentUrl>
+		<LiveMatchesUrl>http://cricinfo.com/cricket/live-score</LiveMatchesUrl>
+		<TitleUrl>http://cricinfo.com/</TitleUrl>
+	</Urls>
+	<Schedules hits="0">
+	</Schedules>
+</Results>
+
