@@ -126,7 +126,7 @@
 				<executions>
 					<execution>
 						<id>my-execution</id>
-						<phase>package</phase>
+						<phase>deploy</phase>
 						<goals>
 							<goal>java</goal>
 						</goals>
