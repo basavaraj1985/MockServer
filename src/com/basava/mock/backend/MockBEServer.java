@@ -83,7 +83,7 @@ public class MockBEServer
     {
     	context.addServlet(new ServletHolder(new HelloServlet()),"/hello/*");
 //    	context.addServlet(new ServletHolder(new MockResponseServlet(configurnProperties)), "/vitraveldd_api/V1/destination/*");
-    	context.addServlet(new ServletHolder(new MockResponseServlet(confignPropertiesFile)), "/*");
+    	context.addServlet(new ServletHolder(new MockResponseServlet(confignPropertiesFile)), "/test/*");
 	}
 
 	public void start()
