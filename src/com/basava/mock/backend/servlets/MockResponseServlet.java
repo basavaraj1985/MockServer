@@ -1,9 +1,8 @@
 package com.basava.mock.backend.servlets;
 
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,11 +34,24 @@ public class MockResponseServlet extends HttpServlet
 
 	private boolean isFirstRequest = true;
 	public static final int DEFAULT_CONFIGURATION_UPDATE_INTERVAL_MS = 5 * 1000 ;
+
+	private Queue<Map> requestParamsQueue;
 	
 	public MockResponseServlet(String confFile) 
 	{
-		this.configPropertiesFile = confFile ;
+		this(confFile, null);
+	}
+
+	/**
+	 *
+	 * @param configFile
+	 * @param requestParamsObjectQueue
+	 */
+	public MockResponseServlet(String configFile, Queue requestParamsObjectQueue)
+	{
+		this.configPropertiesFile = configFile ;
 		confignProperties = FileUtils.loadFileIntoProperties(configPropertiesFile);
+		requestParamsQueue = requestParamsObjectQueue;
 	}
 
 	/**
@@ -63,7 +75,6 @@ public class MockResponseServlet extends HttpServlet
 						synchronized (confignProperties)
 						{
 							confignProperties = FileUtils.loadFileIntoProperties(configPropertiesFile);
-							System.out.println("Loaded new configuration!");
 						}
 						try
 						{
@@ -90,6 +101,30 @@ public class MockResponseServlet extends HttpServlet
 		}
 		String requestURI = req.getRequestURI();
 		String requestURL = req.getRequestURL().toString();
+		System.out.println("Request URI : " + requestURI );
+		System.out.println("Request URL : " + requestURL );
+		System.out.println("Request parameters : ");
+		Map<String, String[]> parameterMap = req.getParameterMap();
+		if ( null != parameterMap  && parameterMap.size() > 0 )
+		{
+			if ( null != requestParamsQueue )
+			{
+				requestParamsQueue.add(parameterMap);
+			}
+			Iterator<Map.Entry<String, String[]>> iterator = parameterMap.entrySet().iterator();
+			while ( iterator.hasNext() )
+			{
+				Map.Entry<String, String[]> next = iterator.next();
+				StringBuilder builder = new StringBuilder();
+				String[] values = next.getValue();
+				for ( String s : values )
+				{
+					builder.append(s);
+				}
+				System.out.println(next.getKey() + " : " + builder.toString() );
+			}
+		}
+
 		response.setContentType("text/xml");
 		response.setStatus(HttpServletResponse.SC_OK);
 		if ( ! formResponse(response, req) ) 
