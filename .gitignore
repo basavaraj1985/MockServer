@@ -1,2 +1,9 @@
 bin
 target
+*.ipr
+*.iml
+*.swp
+*.classpath
+log/
+*.log
+*.iws
