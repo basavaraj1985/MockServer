@@ -19,15 +19,15 @@ import com.basava.robot.libs.FileUtils;
  * @author Basavaraj M
  *
  */
-public class MockResponseServlet extends HttpServlet  
+public class MockResponseServlet extends HttpServlet
 {
-	
+
 	public static final String CITYGUIDE_RESP = "cityGuideResponse";
 	public static final String SUPPORT_REGEX = "regex::";
 	public static boolean sleep = false;
 
 	/**
-	 * Generated serial id 
+	 * Generated serial id
 	 */
 	private static final long serialVersionUID = -1119871127587995253L;
 	private String configPropertiesFile;
@@ -35,8 +35,8 @@ public class MockResponseServlet extends HttpServlet
 
 	private boolean isFirstRequest = true;
 	public static final int DEFAULT_CONFIGURATION_UPDATE_INTERVAL_MS = 5 * 1000 ;
-	
-	public MockResponseServlet(String confFile) 
+
+	public MockResponseServlet(String confFile)
 	{
 		this.configPropertiesFile = confFile ;
 		confignProperties = FileUtils.loadFileIntoProperties(configPropertiesFile);
@@ -48,12 +48,12 @@ public class MockResponseServlet extends HttpServlet
 	 */
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse response)
-			throws ServletException, IOException 
+			throws ServletException, IOException
 	{
 		if ( isFirstRequest )
 		{
 			isFirstRequest = false;
-			
+
 			Thread configUpdaterThread = new Thread( new Runnable(){
 				@Override
 				public void run()
@@ -92,7 +92,7 @@ public class MockResponseServlet extends HttpServlet
 		String requestURL = req.getRequestURL().toString();
 		response.setContentType("text/xml");
 		response.setStatus(HttpServletResponse.SC_OK);
-		if ( ! formResponse(response, req) ) 
+		if ( ! formResponse(response, req) )
 		{
 			response.getWriter().println("<root>");
 			response.getWriter().println("<reqURI>" + requestURI + "</reqURI>");
@@ -123,25 +123,33 @@ public class MockResponseServlet extends HttpServlet
 		}
 		System.out.println(".");
 	}
-	
-	private boolean formResponse(HttpServletResponse response, HttpServletRequest req) throws IOException 
+
+	private boolean formResponse(HttpServletResponse response, HttpServletRequest req) throws IOException
 	{
 		String requestURI = req.getRequestURI();
 		String url = req.getRequestURL().toString();
 		String fileToLoadAndSetAsResponse = null;
-		
+		Boolean exact_match = Boolean.valueOf(confignProperties.getProperty("exact_match"));
+
 		Set<Object> keySet = confignProperties.keySet();
-		
+
 		Iterator<Object> iterator = keySet.iterator();
 		while ( iterator.hasNext() )
 		{
 			String next = (String) iterator.next();
-			if ( requestURI.contains(next) && ! next.contains(SUPPORT_REGEX))
+ 			if (!exact_match && requestURI.contains(next) && ! next.contains(SUPPORT_REGEX))
 			{
 				fileToLoadAndSetAsResponse = confignProperties.getProperty(next);
 				break;
 			}
-			
+
+			if (exact_match && requestURI.matches(next) && ! next.contains(SUPPORT_REGEX))
+			{
+				fileToLoadAndSetAsResponse = confignProperties.getProperty(next);
+				break;
+
+			}
+
 			if ( next.startsWith(SUPPORT_REGEX))
 			{
 				String actualExpr = next.split(SUPPORT_REGEX)[1];
@@ -161,7 +169,7 @@ public class MockResponseServlet extends HttpServlet
 				}
 			}
 		}
-		
+
 		if ( fileToLoadAndSetAsResponse == null && requestURI.contains("vitraveldd_api/V1/destination"))
 		{
 			fileToLoadAndSetAsResponse = confignProperties.getProperty(CITYGUIDE_RESP);
@@ -177,14 +185,14 @@ public class MockResponseServlet extends HttpServlet
 	        response.getWriter().println("</root>");
 	        return false;
 		}
-		
+
 		String[] splits = fileToLoadAndSetAsResponse.split("::");
 		if ( splits != null && splits.length > 1 )
 		{
 			response.setContentType(splits[0]);
 			fileToLoadAndSetAsResponse = splits[1];
 		}
-		
+
 		if ( fileToLoadAndSetAsResponse != null )
 		{
 			System.out.println("Request : " + req.getRequestURI() );
