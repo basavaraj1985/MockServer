@@ -22,7 +22,6 @@ import com.basava.robot.libs.FileUtils;
 public class MockResponseServlet extends HttpServlet
 {
 
-	public static final String CITYGUIDE_RESP = "cityGuideResponse";
 	public static final String SUPPORT_REGEX = "regex::";
 	public static boolean sleep = false;
 
@@ -129,7 +128,21 @@ public class MockResponseServlet extends HttpServlet
 		String requestURI = req.getRequestURI();
 		String url = req.getRequestURL().toString();
 		String fileToLoadAndSetAsResponse = null;
-		Boolean exact_match = Boolean.valueOf(confignProperties.getProperty("exact_match"));
+		Boolean exact_match = Boolean.valueOf(confignProperties.getProperty("exact_match", "true"));
+		Boolean debug = Boolean.valueOf(confignProperties.getProperty("debug", "false"));
+
+		if ( debug )
+		{
+			Set<Object> keySet = confignProperties.keySet();
+			Iterator<Object> iterator = keySet.iterator();
+			System.out.println("========================================");
+			while( iterator.hasNext() )
+			{
+				String key = (String) iterator.next();
+				System.out.println(key + confignProperties.getProperty(key));
+			}
+			System.out.println("========================================");
+		}
 
 		Set<Object> keySet = confignProperties.keySet();
 
@@ -143,7 +156,7 @@ public class MockResponseServlet extends HttpServlet
 				break;
 			}
 
-			if (exact_match && requestURI.matches(next) && ! next.contains(SUPPORT_REGEX))
+			if (exact_match && requestURI.equalsIgnoreCase(next) && ! next.contains(SUPPORT_REGEX))
 			{
 				fileToLoadAndSetAsResponse = confignProperties.getProperty(next);
 				break;
@@ -170,22 +183,6 @@ public class MockResponseServlet extends HttpServlet
 			}
 		}
 
-		if ( fileToLoadAndSetAsResponse == null && requestURI.contains("vitraveldd_api/V1/destination"))
-		{
-			fileToLoadAndSetAsResponse = confignProperties.getProperty(CITYGUIDE_RESP);
-		}
-		else if ( fileToLoadAndSetAsResponse == null )
-		{
-			System.out.println("Request : " + req.getRequestURI() );
-			System.err.println("Could not select response file!");
-			response.setContentType("text/xml");
-	        response.setStatus(HttpServletResponse.SC_OK);
-			response.getWriter().println("<root>");
-	        response.getWriter().println("<h1>Could not map the request URI to a response file!</h1>");
-	        response.getWriter().println("</root>");
-	        return false;
-		}
-
 		String[] splits = fileToLoadAndSetAsResponse.split("::");
 		if ( splits != null && splits.length > 1 )
 		{
@@ -201,6 +198,30 @@ public class MockResponseServlet extends HttpServlet
 			response.getWriter().println(buffer.toString());
 			return true;
 		}
-		return false;
+		else
+		{
+			System.out.println("Request : " + req.getRequestURI() );
+			System.err.println("Could not select response file!");
+			response.setContentType("text/xml");
+			response.setStatus(HttpServletResponse.SC_OK);
+			response.getWriter().println("<root>");
+			response.getWriter().println("<h1>Could not map the request URI to a response file!</h1>");
+			response.getWriter().println("</root>");
+			return false;
+		}
+	}
+
+	public static void main(String[] args) {
+		String req = "/catalog/datasource/1/schema/test_automation_db/table/test_fullrefresh_single_table_with_pk85363/column/";
+		String target = "/catalog/datasource/1/schema/";
+
+		if ( req.matches(target))
+		{
+			System.err.println("Found the bug!");
+		}
+		else
+		{
+			System.out.println("not a bug!");
+		}
 	}
 }
